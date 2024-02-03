@@ -14,6 +14,19 @@ public class CheckersNetworkManager : NetworkManager
     public static event Action ClientOnConnected;
 
     public List<PlayerNetwork> networkPlayers { get; } = new List<PlayerNetwork>();
+    public override void OnStartServer()
+    {
+        var boardInstance = Instantiate(boardPrefab);
+        NetworkServer.Spawn(boardInstance);
+        var turnsHandlerInstance = Instantiate(turnsHandlerPrefab);
+        NetworkServer.Spawn(turnsHandlerInstance);
+
+    }
+    public override void OnServerChangeScene(string newSceneName)
+    {
+        var gameoverHandlerInstance = Instantiate(gameOverHandlerPrefab);
+        NetworkServer.Spawn(gameoverHandlerInstance);
+    }
     public override void OnClientConnect()
     {
         base.OnClientConnect();
@@ -25,7 +38,8 @@ public class CheckersNetworkManager : NetworkManager
         NetworkServer.AddPlayerForConnection(conn, playerInstance);
         var player = playerInstance.GetComponent<PlayerNetwork>();
         networkPlayers.Add(player);
-        player.IsWhite = numPlayers == 1;
+        
+        player.LobbyOwner = player.IsWhite = numPlayers == 1;
         player.DisplayName = player.IsWhite ? "Светлый" : "Тёмный";
     }
     public override void OnServerDisconnect(NetworkConnection conn)

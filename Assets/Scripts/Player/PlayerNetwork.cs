@@ -8,8 +8,9 @@ using UnityEngine;
 public class PlayerNetwork : Player
 {
     public static event Action ClientOnInfoUpdated;
-    [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
+    public static event Action<bool> AuthorotyOnLobbyOwnerStateUpdated;
 
+    [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     string displayName;
     public string DisplayName
     {
@@ -17,20 +18,30 @@ public class PlayerNetwork : Player
         [Server]
         set { displayName = value; }
     }
-    string lobbyOwner;
-    public string LobbyOwner
+
+    [SyncVar(hook = nameof(AutorotyHandleLobbyOwnerStateUpdated))]
+    bool lobbyOwner;
+    public bool LobbyOwner
     {
         get { return lobbyOwner; }
         [Server]
         set { lobbyOwner = value; }
     }
-
+    
 
     void ClientHandleDisplayNameUpdated(string oldName, string newName)
     {
 
         ClientOnInfoUpdated?.Invoke();
     }
+    void AutorotyHandleLobbyOwnerStateUpdated(bool oldState, bool newState)
+        {
+            if (!hasAuthority)
+            {
+                return;
+            }
+        AuthorotyOnLobbyOwnerStateUpdated?.Invoke(newState);
+        }
     public override void OnStartClient()
     {
         if (!isClientOnly) return;
@@ -44,4 +55,5 @@ public class PlayerNetwork : Player
         ((CheckersNetworkManager)NetworkManager.singleton).networkPlayers.Remove(this);
         ClientOnInfoUpdated?.Invoke();
     }
+
 }

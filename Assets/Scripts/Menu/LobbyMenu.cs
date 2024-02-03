@@ -12,11 +12,13 @@ public class LobbyMenu : MonoBehaviour
     [SerializeField] Text[] playerNameTexts = new Text[2];
     private void Start()
     {
+        PlayerNetwork.AuthorotyOnLobbyOwnerStateUpdated += AuthorotyHandleLobbyOwnerStateUpdated;
         PlayerNetwork.ClientOnInfoUpdated += ClientHandleInfoUpdated;
     }
     private void OnDestroy()
     {
         PlayerNetwork.ClientOnInfoUpdated -= ClientHandleInfoUpdated;
+        PlayerNetwork.AuthorotyOnLobbyOwnerStateUpdated -= AuthorotyHandleLobbyOwnerStateUpdated;
     }
     private void ClientHandleInfoUpdated()
     {
@@ -29,10 +31,15 @@ public class LobbyMenu : MonoBehaviour
         {
             playerNameTexts[i].text = "∆дЄм игрока...";
         }
+        startGameButton.interactable = players.Count > 1;
+    }
+    private void AuthorotyHandleLobbyOwnerStateUpdated(bool state)
+    {
+        startGameButton.gameObject.SetActive(state);
     }
 
     public void StartGame()
     {
-           
+        NetworkManager.singleton.ServerChangeScene("Game Scene");
     }
 }
