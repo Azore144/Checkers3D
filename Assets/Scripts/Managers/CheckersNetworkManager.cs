@@ -12,7 +12,7 @@ public class CheckersNetworkManager : NetworkManager
     [SerializeField] GameObject gameOverHandlerPrefab, boardPrefab, 
         turnsHandlerPrefab;
     public static event Action ClientOnConnected;
-
+    public static event Action ServerOnGameStarted;
     public List<PlayerNetwork> networkPlayers { get; } = new List<PlayerNetwork>();
     public override void OnStartServer()
     {
@@ -22,10 +22,19 @@ public class CheckersNetworkManager : NetworkManager
         NetworkServer.Spawn(turnsHandlerInstance);
 
     }
-    public override void OnServerChangeScene(string newSceneName)
+    /*    public override void OnServerChangeScene(string newSceneName)
+        {
+            var gameoverHandlerInstance = Instantiate(gameOverHandlerPrefab);
+            NetworkServer.Spawn(gameoverHandlerInstance);
+        }*/
+    public override void OnServerSceneChanged(string sceneName)
     {
-        var gameoverHandlerInstance = Instantiate(gameOverHandlerPrefab);
-        NetworkServer.Spawn(gameoverHandlerInstance);
+        if(sceneName.StartsWith("Game"))
+        {
+            ServerOnGameStarted?.Invoke();
+            var gameOverHandlerInstance = Instantiate(gameOverHandlerPrefab);
+            NetworkServer.Spawn(gameOverHandlerInstance);
+        }
     }
     public override void OnClientConnect()
     {

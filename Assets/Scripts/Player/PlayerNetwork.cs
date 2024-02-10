@@ -27,7 +27,10 @@ public class PlayerNetwork : Player
         [Server]
         set { lobbyOwner = value; }
     }
-    
+    private void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 
     void ClientHandleDisplayNameUpdated(string oldName, string newName)
     {
