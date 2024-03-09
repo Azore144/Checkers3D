@@ -58,5 +58,10 @@ public class PlayerNetwork : Player
         ((CheckersNetworkManager)NetworkManager.singleton).networkPlayers.Remove(this);
         ClientOnInfoUpdated?.Invoke();
     }
+    [Command]
+    public void CMDNextTurn()
+    {
+        TurnsHandler.Instance.NextTurn();
+    }
 
 }
