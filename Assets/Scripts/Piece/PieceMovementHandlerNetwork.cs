@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class PieceMovementHandlerNetwork : PieceMovementHandler
 {
@@ -32,5 +33,14 @@ public class PieceMovementHandlerNetwork : PieceMovementHandler
     void CMDCapture(Vector2Int piecePosition)
     {
         base.Capture(piecePosition);
+    }
+    [ClientRpc]
+    void RPCPlayAudio()
+    {
+        base.PlayAudio();
+    }
+    protected override void PlayAudio()
+    {
+        RPCPlayAudio();
     }
 }
