@@ -10,9 +10,20 @@ public class PieceNetwork : NetworkBehaviour
     public override void OnStartServer()
     {
         owner = connectionToClient.identity.GetComponent<PlayerPiecesHandler>();
+        Board.Instance.OnPieceCaptured += ServerHandlePieceCapture;
+    }
+    public override void OnStopServer()
+    {
+        Board.Instance.OnPieceCaptured -= ServerHandlePieceCapture;
     }
     void HandleOwnerSet(PlayerPiecesHandler oldowner, PlayerPiecesHandler newowner)
     {
         transform.parent = newowner.PiecesParent;
+    }
+    [Server]
+    void ServerHandlePieceCapture(Vector3 capturedPiecePos)
+    {
+        if (capturedPiecePos != transform.position) return;
+        NetworkServer.Destroy(gameObject);
     }
 }

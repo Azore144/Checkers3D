@@ -2,11 +2,13 @@ using Mirror;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class PieceMovementHandlerNetwork : PieceMovementHandler
 {
+    public static event Func<PiecePromotionHandler, int, int, bool> OnPieceReachedBackline;
     public override void OnStartAuthority()
     {
         TilesSelectionHandler.OnTileSelected += HandleTileSelected;
@@ -42,5 +44,9 @@ public class PieceMovementHandlerNetwork : PieceMovementHandler
     protected override void PlayAudio()
     {
         RPCPlayAudio();
+    }
+    protected override void ReachedBackline(Vector2Int newPosition)
+    {
+        OnPieceReachedBackline?.Invoke(promotionHandler, newPosition.x, newPosition.y);
     }
 }
